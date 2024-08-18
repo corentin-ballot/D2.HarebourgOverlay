@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D2.Overlay</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
+        }
+
+        .cell {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            transform: skew(-63deg, 27deg);
+            background-color: #ffffff;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        .cell:hover {
+            opacity: 0.3;
+        }
+
+        .cell.selected {
+            background-color: #0000ff;
+            opacity: .5;
+        }
+
+        .cell.rotated {
+            background-color: #ff0000;
+            opacity: .5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+
+
+    <script>
+        const cellCount = 559;
+        const cellWidth = 14;
+        const cellHeight = cellCount / cellWidth;
+        let selectedCellId = -1;
+        let rotation = -90;
+        let rotatedCellId = 0;
+
+        window.api.on('set::rotation', async (event, arg) => { 
+            console.log('set::rotation', arg)
+            rotation = arg; 
+        });
+
+        /**
+         * Get mouse position of the cellid passed in parameters.
+         * @param {*} cellid Dofus cellid
+         */
+        const getCellPosition = (cellid) => {
+            let x = 20 + 87.5 * (cellid % cellWidth) + 44 * (Math.floor(cellid / cellWidth) % 2);
+            let y = 10 + 21.8 * Math.floor(cellid / cellWidth);
+
+            return { x, y };
+        };
+
+        /**
+         * Get cartesian position of the cellid passed in parameters.
+         * @param {*} cellid Dofus cellid
+         */
+        const getCellCoords = (cellid) => {
+            const cellLine = (cellid) / cellWidth;
+
+            let x = (cellid % cellWidth) + Math.round(cellLine / 2);
+            let y = (cellid % cellWidth) - Math.trunc(cellLine / 2);
+
+            return { x, y };
+        };
+
+        /**
+         * Get cartesian position of the cellid using custom origin cell.
+         * @param {*} originId Dofus cell id origin
+         * @param {*} targetId Dofus cell target
+         */
+        const getRelativeCellCoords = (originId, targetId) => {
+            let x = getCellCoords(targetId).x - getCellCoords(originId).x;
+            let y = getCellCoords(targetId).y - getCellCoords(originId).y;
+
+            return { x, y };
+        };
+
+        const rotate = (point, deg) => {
+            let x = point.x * Math.cos(deg * (Math.PI / 180)) - point.y * Math.sin(deg * (Math.PI / 180));
+            let y = point.x * Math.sin(deg * (Math.PI / 180)) + point.y * Math.cos(deg * (Math.PI / 180));
+
+            return { x: Math.round(x), y: Math.round(y) };
+        }
+
+        const cells = [];
+        const container = document.getElementById("container");
+        for (let cellId = 0; cellId <= cellCount; cellId++) {
+            const cellPosition = getCellPosition(cellId);
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.setAttribute("style", `top:${cellPosition.y}px;left:${cellPosition.x}px;`);
+            cell.setAttribute("id", cellId);
+            // cell.innerText = `${cellId}`;
+            cell.addEventListener("mouseenter", (event) => {
+                if(selectedCellId === -1) return; 
+                const cellid = event.target.id;
+                // console.log("cellid", cellid);
+                const relativeCellPoint = getRelativeCellCoords(selectedCellId, cellid);
+                // console.log("relativeCellPoint", relativeCellPoint);
+                const relativeRotatedPoint = rotate(relativeCellPoint, rotation);
+                // console.log("relativeRotatedPoint", relativeRotatedPoint);
+                const originPoint = getCellCoords(selectedCellId);
+                // console.log("originPoint", originPoint);
+                const absoluteRotatedPoint = {x : relativeRotatedPoint.x + originPoint.x, y : relativeRotatedPoint.y + originPoint.y}
+                // console.log("absoluteRotatedPoint",absoluteRotatedPoint);
+                try {
+                    const rotatedCellId = cells[absoluteRotatedPoint.x][absoluteRotatedPoint.y];
+                    // console.log(rotatedCellId);
+                    const rotatedCell = document.getElementById(rotatedCellId);
+                    rotatedCell.classList.add("rotated");
+                } catch (e) {
+                    console.error("out of map");
+                }
+            });            
+            cell.addEventListener("mouseleave", (event) => {
+                document.querySelectorAll(".rotated").forEach(element => {
+                    element.classList.remove("rotated");
+                });;
+            });
+            cell.addEventListener("click", (event) => {
+                if(selectedCellId !== -1) {
+                    const previousSelected = document.getElementById(selectedCellId);
+                    previousSelected.classList.remove("selected");
+                }
+                const newSelected = document.getElementById(event.target.id);
+                newSelected.classList.add("selected");
+                selectedCellId = event.target.id;
+
+                window.api.disableMouseEvent();
+            });
+            container.appendChild(cell);
+
+            // store cellId for revert getCellCoords()
+            const cellCoords = getCellCoords(cellId);
+            if(!Array.isArray(cells[cellCoords.x])) cells[cellCoords.x] = [];
+            cells[cellCoords.x][cellCoords.y] = cellId;
+
+            
+        }
+
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>/</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:600|Work+Sans:300" rel="stylesheet">
+    <style>
+        /** Font **/
+        body {
+            font-family: 'Work Sans', sans-serif;
+            font-weight: 300;
+            margin: 0;
+            background-color: white;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: Montserrat, Arial, Verdana, "Lucida Grande", sans-serif;
+            font-weight: 600;
+            color: #010035;
+            margin: 0 0 1rem 0;
+        }
+
+        P, .p {
+            margin: 0 0 1rem 0;
+        }
+
+        /** Inputs **/
+        input[type="text"],
+        input[type="number"],
+        select {
+            box-shadow: none;
+            border: none;
+            border-bottom-color: currentcolor;
+            border-bottom-style: none;
+            border-bottom-width: medium;
+            border-bottom: 1px solid #999;
+            height: auto;
+            font-size: 1rem;
+            text-align: left;
+            padding: .5rem;
+            background-color: transparent;
+            margin: 0 0 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #0F172A;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            padding: .25rem .5rem;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+            min-width: 100px;
+            max-width: 280px;
+            border-radius: 50px;
+            font-size: 1rem;
+            margin: 0 0 .5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background: #1f2b49;
+        }
+
+        .wrapper {
+            margin: 0 .5rem;
+        }
+
+        .drag {
+            background-color: lightskyblue;
+            -webkit-user-select: none;
+            -webkit-app-region: drag;
+            cursor: move;
+            text-align: center;
+            font-weight: bold;
+            margin: 0 0 .5rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="drag"><span id="name">Harebourg</span></div>
+
+    <div class="wrapper">
+        <select id="rotation">
+            <option value="-90">100% à 90%</option>
+            <option value="90">89% à 75%</option>
+            <option value="180">74% à 45%</option>
+            <option value="90">44% à 30%</option>
+            <option value="-90">29% à 0%</option>
+        </select>
+        
+        <button id="place">Place</button>
+    </div>
+
+    <script>
+        // Path select
+        let place = document.getElementById("place");
+        place.addEventListener("click", () => {
+            window.api.enableMouseEvent();
+        })
+
+        document.getElementById("rotation").addEventListener("change", () => {
+            console.log('set::rotation', document.getElementById("rotation").value)
+            window.api.send("set::rotation", document.getElementById("rotation").value);
+        });
+
+
+    </script>
+</body>
+
+</html>
