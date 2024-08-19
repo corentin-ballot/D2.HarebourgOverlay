@@ -5,14 +5,17 @@
     <meta charset="UTF-8">
     <title>/</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:600|Work+Sans:300" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/rowdy" rel="stylesheet">
+
     <style>
         /** Font **/
         body {
-            font-family: 'Work Sans', sans-serif;
+            font-family: 'Rowdy', sans-serif;
             font-weight: 300;
             margin: 0;
-            background-color: white;
+            background-color: #1b1d32;
+            border-radius: 2px;
+            overflow: hidden;
         }
 
         h1,
@@ -20,7 +23,7 @@
         h3,
         h4,
         h5 {
-            font-family: Montserrat, Arial, Verdana, "Lucida Grande", sans-serif;
+            font-family: 'Rowdy', Arial, Verdana, "Lucida Grande", sans-serif;
             font-weight: 600;
             color: #010035;
             margin: 0 0 1rem 0;
@@ -33,65 +36,91 @@
         /** Inputs **/
         input[type="text"],
         input[type="number"],
-        select {
-            box-shadow: none;
+        select {            
             border: none;
-            border-bottom-color: currentcolor;
-            border-bottom-style: none;
-            border-bottom-width: medium;
-            border-bottom: 1px solid #999;
-            height: auto;
-            font-size: 1rem;
-            text-align: left;
-            padding: .5rem;
-            background-color: transparent;
-            margin: 0 0 1rem;
+            border-top: solid 1px #7a7c96;
+            background-color: #595b7c;
             width: 100%;
-            box-sizing: border-box;
+            color: #fff;    
+            padding: 5px;
+            font-size: 12px;
+            font-family: 'Rowdy', sans-serif;
+            font-weight: 300;
+            cursor: pointer;
         }
 
-        button {
-            background: #0F172A;
+        button {            
+            font-weight: normal;
             border: none;
+            width: 150px;
+            padding: 8px 16px;
+            margin: auto;
+            box-sizing: border-box;
+            background: transparent;
             color: #fff;
             cursor: pointer;
-            position: relative;
             display: inline-block;
-            padding: .25rem .5rem;
-            text-align: center;
-            text-decoration: none;
-            white-space: nowrap;
-            min-width: 100px;
-            max-width: 280px;
-            border-radius: 50px;
-            font-size: 1rem;
-            margin: 0 0 .5rem;
-            width: 100%;
-            box-sizing: border-box;
+            text-transform: uppercase;
+            font-family: 'Rowdy', sans-serif;
+            position: relative;
+            z-index: 0;
+        }
+        
+        button::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%;  
+            background: linear-gradient(to bottom, #be9a79 0% 2%, #ae8258 2% 50%, #a57345 50% 98%, #735030 98% 100%);
         }
 
-        button:hover {
-            background: #1f2b49;
+        button:hover::before {
+            opacity: .77;
         }
 
-        .wrapper {
-            margin: 0 .5rem;
+        button::after {
+            content: "";
+            position: absolute;
+            z-index:-2;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%;  
+            background: white;
         }
 
-        .drag {
-            background-color: lightskyblue;
+        .header {
             -webkit-user-select: none;
             -webkit-app-region: drag;
             cursor: move;
             text-align: center;
-            font-weight: bold;
-            margin: 0 0 .5rem 0;
+            height: 31px;
+            background-color: #525272;
+            color: white;    
+            padding: 6px 0;
+            box-sizing: border-box;
         }
+
+        .wrapper {
+            margin: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            height: 31px;
+            background-color: #3a3d58;
+            color: white;
+            padding: 8px 0;
+        }
+
     </style>
 </head>
 
 <body>
-    <div class="drag"><span id="name">Harebourg</span></div>
+    <div class="header"><span id="name">Harebourg</span></div>
 
     <div class="wrapper">
         <select id="rotation">
@@ -101,7 +130,9 @@
             <option value="90">44% à 30%</option>
             <option value="-90">29% à 0%</option>
         </select>
-        
+    </div>
+    
+    <div class="footer">
         <button id="place">Place</button>
     </div>
 
@@ -113,7 +144,6 @@
         })
 
         document.getElementById("rotation").addEventListener("change", () => {
-            console.log('set::rotation', document.getElementById("rotation").value)
             window.api.send("set::rotation", document.getElementById("rotation").value);
         });
 

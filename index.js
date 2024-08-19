@@ -51,8 +51,8 @@ function createWindow() {
     win = new BrowserWindow({
         icon: path.join(__dirname, 'icon.png'),
         x: 20, y: 150,
-        width: 150,
-        height: 114,
+        width: 180,
+        height: 129,
         webPreferences: {
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.js'),
@@ -88,8 +88,7 @@ app.whenReady().then(() => {
 })
 
 ipcMain.on('set::rotation', async (event, arg) => {
-    console.log('set::rotation', arg)
-    gridWin.webContents.send("set::rotation", arg)
+    gridWin.webContents.send("set::rotation", arg);
 });
 
 app.on('window-all-closed', () => {
@@ -98,18 +97,12 @@ app.on('window-all-closed', () => {
     }
 });
 
-setInterval(async () => {
-    try {
-        const activeWin = ActiveWindow.getActiveWindow();
-        if (["Dofus.exe"].includes(activeWin.application)) {
-            gridWin.showInactive();
-            win.showInactive();
-        } else {
-            gridWin.hide();
-            win.hide();
-        }
+ActiveWindow.subscribe((windowInfo) => {
+    if (["Dofus.exe", "Electron"].includes(windowInfo.application)) {
+        gridWin.showInactive();
+        win.showInactive();
+    } else {
+        gridWin.hide();
+        win.hide();
     }
-    catch (e) {
-        // console.error(e)
-    }
-}, 50);
+});
